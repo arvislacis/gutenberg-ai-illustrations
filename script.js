@@ -3,6 +3,7 @@
     const SCROLL_IDLE_TIME = 1200; // 1.2 seconds before generating
     const MIN_TEXT_LENGTH = 200; // Minimum visible text to trigger generation
     const GUTENDEX_API = "https://gutendex.com/books";
+    const LOCAL_PROXY_URL = "http://localhost:8080/proxy.php";
 
     // State
     let scrollTimeout = null;
@@ -13,6 +14,8 @@
     let currentSearch = "";
     let totalBooks = 0;
     let bookLoaded = false;
+    let pendingBook = null;
+    let pendingTextUrl = null;
 
     // Elements
     const imagePanel = document.getElementById("image-panel");
@@ -35,6 +38,13 @@
     // Dark mode toggle
     const darkModeToggle = document.getElementById("dark-mode-toggle");
     let darkMode = localStorage.getItem("dark_mode") === "true";
+
+    // Manual text input elements
+    const textInputOverlay = document.getElementById("text-input-overlay");
+    const openBookTabBtn = document.getElementById("open-book-tab");
+    const manualTextInput = document.getElementById("manual-text-input");
+    const cancelTextInputBtn = document.getElementById("cancel-text-input");
+    const submitTextInputBtn = document.getElementById("submit-text-input");
 
     function applyDarkMode() {
         if (darkMode) {
@@ -137,58 +147,114 @@
         pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
     }
 
-    async function loadBook(book) {
-        bookSelectOverlay.classList.add("hidden");
-        bookLoading.classList.remove("hidden");
-        document.querySelector("main.book-content").innerHTML = '<p style="text-align:center;">Loading book...</p>';
-
-        // Update header
+    function updateBookHeader(book) {
         const titleParts = book.title.split(";");
         document.querySelector(".book-title").textContent = titleParts[0].trim();
         document.querySelector(".book-subtitle").textContent = titleParts[1] ? titleParts[1].trim() : "";
         const authors = book.authors.map((a) => a.name).join(", ") || "Unknown Author";
         document.querySelector(".book-author").textContent = `by ${authors}`;
 
-        // Update footer link
         const bookUrl = document.querySelector(".book-url");
         bookUrl.href = `https://www.gutenberg.org/ebooks/${book.id}`;
+    }
 
-        // Find plain text URL
-        const textUrl = book.formats["text/plain; charset=utf-8"] ||
+    function getTextUrl(book) {
+        return book.formats["text/plain; charset=utf-8"] ||
             book.formats["text/plain; charset=us-ascii"] ||
             book.formats["text/plain"] ||
             Object.entries(book.formats).find(([k]) => k.startsWith("text/plain"))?.[1];
+    }
+
+    function finishLoadingBook(text) {
+        renderBookContent(text);
+        bookLoaded = true;
+        bookLoading.classList.add("hidden");
+
+        setTimeout(() => {
+            const visibleText = getVisibleText();
+            if (visibleText.length >= MIN_TEXT_LENGTH && apiKey) {
+                currentImageHash = hashText(visibleText);
+                generateImage(visibleText);
+            }
+        }, SCROLL_IDLE_TIME);
+    }
+
+    function showManualTextInput(book, textUrl) {
+        pendingBook = book;
+        pendingTextUrl = textUrl;
+        manualTextInput.value = "";
+        textInputOverlay.classList.remove("hidden");
+    }
+
+    async function loadBook(book) {
+        bookSelectOverlay.classList.add("hidden");
+        bookLoading.classList.remove("hidden");
+        document.querySelector("main.book-content").innerHTML = '<p style="text-align:center;">Loading book...</p>';
+
+        updateBookHeader(book);
+
+        const textUrl = getTextUrl(book);
 
         if (!textUrl) {
             document.querySelector("main.book-content").innerHTML = '<p style="text-align:center;">No plain text version available for this book.</p>';
-
+            bookLoading.classList.add("hidden");
             return;
         }
 
         try {
-            // Use CORS proxy to bypass Gutenberg's CORS restrictions
-            const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(textUrl);
+            const proxyUrl = `${LOCAL_PROXY_URL}?url=${encodeURIComponent(textUrl)}`;
             const response = await fetch(proxyUrl);
+
+            if (!response.ok) {
+                throw new Error(`Proxy error: ${response.status}`);
+            }
+
             const text = await response.text();
 
-            renderBookContent(text);
+            if (text.includes('"error"')) {
+                throw new Error("Proxy returned error");
+            }
 
-            bookLoaded = true;
-
-            // Trigger initial image generation after book loads
-            setTimeout(() => {
-                const visibleText = getVisibleText();
-
-                if (visibleText.length >= MIN_TEXT_LENGTH && apiKey) {
-                    currentImageHash = hashText(visibleText);
-                    generateImage(visibleText);
-                }
-            }, SCROLL_IDLE_TIME);
+            finishLoadingBook(text);
         } catch (error) {
-            console.error("Failed to load book:", error);
-            document.querySelector("main.book-content").innerHTML = '<p style="text-align:center;">Failed to load book content. Please try another book.</p>';
+            console.error("Local proxy failed:", error);
+            bookLoading.classList.add("hidden");
+            showManualTextInput(book, textUrl);
         }
     }
+
+    openBookTabBtn.addEventListener("click", () => {
+        if (pendingTextUrl) {
+            window.open(pendingTextUrl, "_blank");
+        }
+    });
+
+    cancelTextInputBtn.addEventListener("click", () => {
+        textInputOverlay.classList.add("hidden");
+        pendingBook = null;
+        pendingTextUrl = null;
+        bookSelectOverlay.classList.remove("hidden");
+    });
+
+    submitTextInputBtn.addEventListener("click", () => {
+        const text = manualTextInput.value.trim();
+
+        if (text.length < 100) {
+            alert("Please paste at least 100 characters of book text.");
+            return;
+        }
+
+        textInputOverlay.classList.add("hidden");
+
+        if (pendingBook) {
+            updateBookHeader(pendingBook);
+        }
+
+        finishLoadingBook(text);
+
+        pendingBook = null;
+        pendingTextUrl = null;
+    });
 
     function renderBookContent(text) {
         const main = document.querySelector("main.book-content");

@@ -501,3 +501,133 @@ body.dark-mode #pagination {
 body.dark-mode #page-info {
     color: #aaa;
 }
+
+/* Text input overlay for manual paste */
+#text-input-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+#text-input-overlay.hidden {
+    display: none;
+}
+
+#text-input-popup {
+    background: #faf9f7;
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode #text-input-popup {
+    background: #1a1a1a;
+}
+
+#text-input-popup h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.3rem;
+    font-weight: normal;
+    color: #1a4a5e;
+    text-align: center;
+}
+
+body.dark-mode #text-input-popup h2 {
+    color: #7db8c9;
+}
+
+#text-input-popup p {
+    text-indent: 0;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+body.dark-mode #text-input-popup p {
+    color: #aaa;
+}
+
+#open-book-tab {
+    display: block;
+    width: 100%;
+    background: #1a4a5e;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+body.dark-mode #open-book-tab {
+    background: #7db8c9;
+    color: #1a1a1a;
+}
+
+#open-book-tab:hover {
+    opacity: 0.9;
+}
+
+#manual-text-input {
+    width: 100%;
+    height: 200px;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    margin-bottom: 1rem;
+}
+
+body.dark-mode #manual-text-input {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+.text-input-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.text-input-buttons button {
+    background: #1a4a5e;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+body.dark-mode .text-input-buttons button {
+    background: #7db8c9;
+    color: #1a1a1a;
+}
+
+#cancel-text-input {
+    background: #999;
+}
+
+body.dark-mode #cancel-text-input {
+    background: #666;
+    color: #e0e0e0;
+}
+
+.text-input-buttons button:hover {
+    opacity: 0.9;
+}

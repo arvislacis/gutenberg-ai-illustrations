@@ -55,6 +55,20 @@
         </p>
     </div>
 
+    <!-- Manual text input modal -->
+    <div id="text-input-overlay" class="hidden">
+        <div id="text-input-popup">
+            <h2>Paste Book Text</h2>
+            <p>The proxy server is unavailable. Please open the book in a new tab, copy the text, and paste it below.</p>
+            <button id="open-book-tab">Open Book in New Tab</button>
+            <textarea id="manual-text-input" placeholder="Paste the book text here..."></textarea>
+            <div class="text-input-buttons">
+                <button id="cancel-text-input">Cancel</button>
+                <button id="submit-text-input">Load Book</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
