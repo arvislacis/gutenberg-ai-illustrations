@@ -1,23 +1,45 @@
-# Moby-Dick with AI Illustrations
+# Gutenberg AI Illustrations
 
-An interactive reading experience of Herman Melville's *Moby-Dick* that generates Renaissance-style illustrations as you read.
+> Forked from [mrnugget/moby-dick](https://github.com/mrnugget/moby-dick)
+
+An interactive reading experience that generates Renaissance-style illustrations for any public domain book from Project Gutenberg as you read.
 
 ## How it works
 
-- Open `moby-dick.html` in your browser
-- Enter your [Gemini API key](https://aistudio.google.com/apikey) when prompted
-- Read the book — after you stop scrolling for ~1 second, an illustration matching the visible text fades in on the right
-- Select specific text to generate an illustration for that passage
-- Scroll again and the image fades out
+1. Start the local proxy server (see below)
+2. Open `http://localhost:8080/index.html` in your browser
+3. Enter your [OpenRouter API key](https://openrouter.ai/settings/keys) when prompted
+4. Search and select a book from Project Gutenberg's catalog
+5. Read the book — after you stop scrolling for ~1 second, an illustration matching the visible text fades in on the right
+6. Select specific text to generate an illustration for that passage
+7. Scroll again and the image fades out
 
-The illustrations are generated using Google's Gemini 2.5 Flash Image model in a da Vinci sketchbook style — black ink engravings that blend with the page.
+The illustrations are generated using the `google/gemini-2.5-flash-image` model via OpenRouter in a da Vinci sketchbook style — black ink engravings that blend with the page.
+
+## Running the Local Proxy Server
+
+The application requires a local PHP proxy server to fetch books from Project Gutenberg (to handle CORS restrictions).
+
+```bash
+cd gutenberg-ai-illustrations
+php -S localhost:8080
+```
+
+Then open `http://localhost:8080/index.html` in your browser.
+
+**Note:** If the proxy is unavailable, a fallback modal will appear allowing you to manually paste book text or open the book directly in a new tab.
+
+## Features
+
+- **Book Selection**: Browse and search Project Gutenberg's catalog using the Gutendex API
+- **AI Illustrations**: Automatic Renaissance-style illustration generation as you read
+- **Text Selection**: Select specific passages to generate targeted illustrations
+- **Fallback Support**: Manual text input when proxy is unavailable
 
 ## Attribution
 
-The text of *Moby-Dick; or, The Whale* by Herman Melville is in the public domain and was sourced from [Project Gutenberg](https://www.gutenberg.org/ebooks/2701).
-
-> This eBook is for the use of anyone anywhere in the United States and most other parts of the world at no cost and with almost no restrictions whatsoever.
+Book texts are in the public domain and sourced from [Project Gutenberg](https://www.gutenberg.org/).
 
 ## License
 
-The code in this repository is released under the MIT License. The text of Moby-Dick is in the public domain.
+The code in this repository is released under the MIT License. Book texts from Project Gutenberg are in the public domain.
