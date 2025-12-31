@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project Gutenberg book AI illustrations</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button id="dark-mode-toggle" title="Toggle dark mode">☀️</button>
+
+    <header>
+        <h1 class="book-title"></h1>
+        <div class="book-subtitle"></div>
+        <div class="book-author"></div>
+    </header>
+
+    <main class="book-content"></main>
+
+    <footer>
+        <p>This edition is based on the <a href="https://www.gutenberg.org" class="book-url" target="_blank">Project Gutenberg</a> text.</p>
+    </footer>
+
+    <!-- Book selection popup -->
+    <div id="book-select-overlay">
+        <div id="book-select-popup">
+            <h2>Choose a Book from Project Gutenberg</h2>
+            <div class="search-container">
+                <input type="text" id="book-search" placeholder="Search by title or author...">
+                <button id="search-btn">Search</button>
+            </div>
+            <div id="book-list"></div>
+            <div id="book-loading" class="hidden">Loading books...</div>
+            <div id="pagination">
+                <button id="prev-page" disabled>← Previous</button>
+                <span id="page-info"></span>
+                <button id="next-page" disabled>Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image generation panel -->
+    <div id="image-panel">
+        <img id="generated-image" alt="Generated illustration">
+    </div>
+
+    <div id="loading-indicator"></div>
+
+    <div id="api-key-prompt">
+        <label for="api-key-input">Enter your OpenRouter API key:</label><br>
+        <input type="password" id="api-key-input" placeholder="sk-or-...">
+        <button id="save-api-key">Save</button>
+        <p>
+            Get one at <a href="https://openrouter.ai/settings/keys" target="_blank">openrouter.ai</a>
+        </p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
