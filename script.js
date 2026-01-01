@@ -13,17 +13,16 @@
     let currentPage = 1;
     let currentSearch = "";
     let totalBooks = 0;
-    let bookLoaded = false;
     let pendingBook = null;
     let pendingTextUrl = null;
 
     // Elements
-    const imagePanel = document.getElementById("image-panel");
     const generatedImage = document.getElementById("generated-image");
     const loadingIndicator = document.getElementById("loading-indicator");
     const apiKeyPrompt = document.getElementById("api-key-prompt");
     const apiKeyInput = document.getElementById("api-key-input");
     const saveApiKeyBtn = document.getElementById("save-api-key");
+    const apiKeyToggle = document.getElementById("api-key-toggle");
 
     // Book selection elements
     const bookSelectOverlay = document.getElementById("book-select-overlay");
@@ -67,6 +66,7 @@
     // Initialize
     if (apiKey) {
         apiKeyPrompt.classList.add("hidden");
+        apiKeyToggle.classList.remove("hidden");
     }
 
     // Show book selection popup on load
@@ -104,6 +104,7 @@
         bookList.innerHTML = "";
 
         let url = `${GUTENDEX_API}?page=${currentPage}&languages=en`;
+
         if (currentSearch) {
             url += `&search=${encodeURIComponent(currentSearch)}`;
         }
@@ -149,13 +150,19 @@
 
     function updateBookHeader(book) {
         const titleParts = book.title.split(";");
+
         document.querySelector(".book-title").textContent = titleParts[0].trim();
         document.querySelector(".book-subtitle").textContent = titleParts[1] ? titleParts[1].trim() : "";
+
         const authors = book.authors.map((a) => a.name).join(", ") || "Unknown Author";
+
         document.querySelector(".book-author").textContent = `by ${authors}`;
 
         const bookUrl = document.querySelector(".book-url");
         bookUrl.href = `https://www.gutenberg.org/ebooks/${book.id}`;
+
+        document.querySelector("header").classList.remove("hidden");
+        document.querySelector("footer").classList.remove("hidden");
     }
 
     function getTextUrl(book) {
@@ -167,11 +174,12 @@
 
     function finishLoadingBook(text) {
         renderBookContent(text);
-        bookLoaded = true;
+
         bookLoading.classList.add("hidden");
 
         setTimeout(() => {
             const visibleText = getVisibleText();
+
             if (visibleText.length >= MIN_TEXT_LENGTH && apiKey) {
                 currentImageHash = hashText(visibleText);
                 generateImage(visibleText);
@@ -183,6 +191,7 @@
         pendingBook = book;
         pendingTextUrl = textUrl;
         manualTextInput.value = "";
+
         textInputOverlay.classList.remove("hidden");
     }
 
@@ -231,8 +240,10 @@
 
     cancelTextInputBtn.addEventListener("click", () => {
         textInputOverlay.classList.add("hidden");
+
         pendingBook = null;
         pendingTextUrl = null;
+
         bookSelectOverlay.classList.remove("hidden");
     });
 
@@ -241,6 +252,7 @@
 
         if (text.length < 100) {
             alert("Please paste at least 100 characters of book text.");
+
             return;
         }
 
@@ -292,7 +304,10 @@
 
         paragraphs.forEach((para) => {
             const trimmed = para.trim();
-            if (!trimmed) return;
+
+            if (!trimmed) {
+                return;
+            }
 
             // Detect chapter headings
             if (/^(CHAPTER|BOOK|PART|SECTION)\s+[IVXLCDM\d]+/i.test(trimmed) || /^[IVXLCDM]+\.\s*$/i.test(trimmed)) {
@@ -305,23 +320,36 @@
         });
 
         main.innerHTML = html;
+
         window.scrollTo(0, 0);
     }
 
     saveApiKeyBtn.addEventListener("click", () => {
         apiKey = apiKeyInput.value.trim();
+
         if (apiKey) {
             localStorage.setItem("openrouter_api_key", apiKey);
+            apiKeyToggle.classList.remove("hidden");
             apiKeyPrompt.classList.add("hidden");
+        } else {
+            localStorage.removeItem("openrouter_api_key");
+            apiKeyToggle.classList.add("hidden");
         }
+    });
+
+    apiKeyToggle.addEventListener("click", () => {
+        apiKeyInput.value = apiKey;
+        apiKeyPrompt.classList.remove("hidden");
     });
 
     // Get selected text if any
     function getSelectedText() {
         const selection = window.getSelection();
+
         if (selection && selection.toString().trim().length > 20) {
             return selection.toString().trim();
         }
+
         return null;
     }
 
@@ -329,6 +357,7 @@
     function getVisibleText() {
         // First check if user has selected text
         const selectedText = getSelectedText();
+
         if (selectedText) {
             return selectedText.substring(0, 1500);
         }
@@ -413,38 +442,37 @@ Make it single-color (black on white) Renaissance-style engraved line illustrati
 
             if (images.length > 0) {
                 const imageUrl = images[0].image_url?.url;
-                if (imageUrl) {
-                    generatedImage.src = imageUrl;
-                    document.body.classList.add("image-active");
 
-                    generatedImage.onload = () => {
+                if (imageUrl) {
+                    const tempImg = new Image();
+
+                    tempImg.onload = () => {
+                        generatedImage.src = imageUrl;
+                        document.body.classList.add("image-active");
                         generatedImage.classList.add("visible");
                         loadingIndicator.classList.remove("visible");
                     };
+
+                    tempImg.src = imageUrl;
+
                     return;
                 }
             }
 
             console.log("No image in response:", data);
+
             loadingIndicator.classList.remove("visible");
         } catch (error) {
             console.error("Image generation failed:", error);
+
             loadingIndicator.classList.remove("visible");
         } finally {
             isGenerating = false;
         }
     }
 
-    // Hide image
-    function hideImage() {
-        generatedImage.classList.remove("visible");
-    }
-
     // Handle scroll events
     function onScroll() {
-        // Hide image when scrolling starts
-        hideImage();
-
         // Clear existing timeout
         if (scrollTimeout) {
             clearTimeout(scrollTimeout);
@@ -467,6 +495,7 @@ Make it single-color (black on white) Renaissance-style engraved line illustrati
             // Only generate if text changed significantly
             if (textHash !== currentImageHash) {
                 currentImageHash = textHash;
+
                 generateImage(visibleText);
             }
         }, SCROLL_IDLE_TIME);

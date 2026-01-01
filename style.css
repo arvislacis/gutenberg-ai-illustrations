@@ -2,6 +2,10 @@
     box-sizing: border-box;
 }
 
+.hidden {
+    display: none !important;
+}
+
 html {
     font-size: 18px;
 }
@@ -15,7 +19,7 @@ body {
     padding: 2rem 1rem;
     max-width: 38rem;
     margin-left: auto;
-    margin-right: auto;
+    margin-right: calc(40vw + 1rem);
 }
 
 body.dark-mode {
@@ -119,6 +123,20 @@ body.dark-mode footer {
     color: #aaa;
 }
 
+@media (max-width: 1024px) {
+    body {
+        margin-right: auto;
+    }
+
+    #image-panel {
+        display: none;
+    }
+
+    #loading-indicator {
+        display: none;
+    }
+}
+
 @media (max-width: 600px) {
     html {
         font-size: 16px;
@@ -162,6 +180,38 @@ body.dark-mode #dark-mode-toggle {
 }
 
 body.dark-mode #dark-mode-toggle:hover {
+    background: #3a3a3a;
+}
+
+/* API key toggle */
+#api-key-toggle {
+    position: fixed;
+    top: 4rem;
+    left: 1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    background: #faf9f7;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    z-index: 1001;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+#api-key-toggle:hover {
+    background: #eee;
+}
+
+body.dark-mode #api-key-toggle {
+    background: #2a2a2a;
+    border-color: #444;
+}
+
+body.dark-mode #api-key-toggle:hover {
     background: #3a3a3a;
 }
 
@@ -212,9 +262,13 @@ body.dark-mode #generated-image {
     right: calc(20vw);
     top: 50%;
     transform: translate(50%, -50%);
-    width: 8px;
-    height: 8px;
-    background: #1a4a5e;
+    width: 40px;
+    height: 40px;
+    border: 4px solid transparent;
+    border-top-color: #ff6b35;
+    border-right-color: #f7c531;
+    border-bottom-color: #1a4a5e;
+    border-left-color: #7db8c9;
     border-radius: 50%;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -222,23 +276,23 @@ body.dark-mode #generated-image {
 }
 
 body.dark-mode #loading-indicator {
-    background: #7db8c9;
+    border-top-color: #ff8c5a;
+    border-right-color: #ffe066;
+    border-bottom-color: #7db8c9;
+    border-left-color: #a8e6cf;
 }
 
 #loading-indicator.visible {
-    opacity: 0.4;
-    animation: pulse 1.5s ease-in-out infinite;
+    opacity: 1;
+    animation: spin 1s linear infinite;
 }
 
-@keyframes pulse {
-    0%,
-    100% {
-        transform: translateY(-50%) scale(1);
-        opacity: 0.4;
+@keyframes spin {
+    0% {
+        transform: translate(50%, -50%) rotate(0deg);
     }
-    50% {
-        transform: translateY(-50%) scale(1.5);
-        opacity: 0.2;
+    100% {
+        transform: translate(50%, -50%) rotate(360deg);
     }
 }
 
@@ -291,10 +345,6 @@ body.dark-mode #api-key-prompt button {
     color: #1a1a1a;
 }
 
-#api-key-prompt.hidden {
-    display: none;
-}
-
 #api-key-prompt a {
     display: inline;
     color: #1a4a5e;
@@ -337,10 +387,6 @@ body.dark-mode #api-key-prompt p {
     align-items: center;
     justify-content: center;
     z-index: 2000;
-}
-
-#book-select-overlay.hidden {
-    display: none;
 }
 
 #book-select-popup {
@@ -422,8 +468,47 @@ body.dark-mode #pagination button {
 #book-list {
     flex: 1;
     overflow-y: auto;
-    min-height: 200px;
     max-height: 400px;
+    scrollbar-width: thin;
+    scrollbar-color: #1a4a5e #e8e6e3;
+}
+
+#book-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+#book-list::-webkit-scrollbar-track {
+    background: #e8e6e3;
+    border-radius: 4px;
+}
+
+#book-list::-webkit-scrollbar-thumb {
+    background: #1a4a5e;
+    border-radius: 4px;
+}
+
+#book-list::-webkit-scrollbar-thumb:hover {
+    background: #2a6a82;
+}
+
+body.dark-mode #book-list {
+    scrollbar-color: #7db8c9 #2a2a2a;
+}
+
+body.dark-mode #book-list::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+
+body.dark-mode #book-list::-webkit-scrollbar-thumb {
+    background: #7db8c9;
+}
+
+body.dark-mode #book-list::-webkit-scrollbar-thumb:hover {
+    background: #9dd0df;
+}
+
+#book-list:not(:empty) {
+    min-height: 200px;
 }
 
 .book-item {
@@ -475,10 +560,6 @@ body.dark-mode #book-loading {
     color: #aaa;
 }
 
-#book-loading.hidden {
-    display: none;
-}
-
 #pagination {
     display: flex;
     justify-content: center;
@@ -514,10 +595,6 @@ body.dark-mode #page-info {
     align-items: center;
     justify-content: center;
     z-index: 2000;
-}
-
-#text-input-overlay.hidden {
-    display: none;
 }
 
 #text-input-popup {
