@@ -4,6 +4,8 @@
 
 An interactive reading experience that generates Renaissance-style illustrations for any public domain book from Project Gutenberg as you read.
 
+**[Live Demo](https://arvislacis.github.io/gutenberg-ai-illustrations/)**
+
 ## How it works
 
 1. Start the local proxy server (see below)

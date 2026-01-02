@@ -182,6 +182,7 @@
 
             if (visibleText.length >= MIN_TEXT_LENGTH && apiKey) {
                 currentImageHash = hashText(visibleText);
+
                 generateImage(visibleText);
             }
         }, SCROLL_IDLE_TIME);
@@ -207,6 +208,7 @@
         if (!textUrl) {
             document.querySelector("main.book-content").innerHTML = '<p style="text-align:center;">No plain text version available for this book.</p>';
             bookLoading.classList.add("hidden");
+
             return;
         }
 
@@ -227,7 +229,9 @@
             finishLoadingBook(text);
         } catch (error) {
             console.error("Local proxy failed:", error);
+
             bookLoading.classList.add("hidden");
+
             showManualTextInput(book, textUrl);
         }
     }
